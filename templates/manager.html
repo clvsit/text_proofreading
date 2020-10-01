@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>智能文本校对后台管理系统</title>
+    <link href="../static/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="../static/style/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div id="app" class="admin">
+    <div class="background"></div>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">智能文本校对后台管理系统</a>
+            </div>
+            <div class="collapse navbar-collapse navbar-right">
+                <form class="navbar-form navbar-left">
+                    <div class="form-group">
+                        <label class="control-label">陈煦</label>
+                        <label class="control-label">管理员</label>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h4 class="h4">数据管理</h4>
+                    <hr/>
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <i class="glyphicon glyphicon-list-alt"></i>
+                        <span class="ml-5">数据查看</span>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="glyphicon glyphicon-hdd"></i>
+                        <span class="ml-5">数据分析</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="panel">
+                <div class="panel-heading">
+                    <h4 class="h4">平台管理</h4>
+                    <hr/>
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <i class="glyphicon glyphicon-user"></i>
+                        <span class="mr-5">用户管理</span>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="glyphicon glyphicon-eye-open"></i>
+                        <span class="mr-5">角色管理</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel panel-main">
+            <div v-if="panelType==0">
+                <div class="panel-heading">
+                    <h3 class="h3" v-text="panelName"></h3>
+                    <hr/>
+                </div>
+                <div class="panel-body">
+                    <div class="">
+                        <div @click="query" class="btn btn-primary">提交</div>
+                    </div>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>输入文本</th>
+                            <th>起始位置</th>
+                            <th>结束位置</th>
+                            <th>服务日期</th>
+                            <th>服务评价</th>
+                        </tr>
+                        <tr v-for="item in dataList">
+                            <td v-text="item.document"></td>
+                            <td v-text="item.start"></td>
+                            <td v-text="item.end"></td>
+                            <td v-text="item.date"></td>
+                            <td v-text="item.type"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../static/script/jquery.min.js"></script>
+<script src="../static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+<script src="../static/script/vue.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            panelType: 0,
+            panelName: "数据查看",
+            query_param: {
+                start: 0,
+                limit: 10
+            },
+            dataList: []
+        },
+        methods: {
+            query() {
+                let _this = this;
+
+                $.ajax({
+                    method: "get",
+                    url: "/manager/data/get",
+                    data: {
+                        start: this.query_param.start,
+                        limit: this.query_param.limit
+                    },
+                    success(resp) {
+                        if (resp.code === 1) {
+                            for (let i = 0, len = resp.data.length; i < len; i++) {
+                                resp.data[i].document = _this.ellipsis(resp.data[i].document);
+                            }
+                            _this.dataList = resp.data;
+                        }
+
+                    }
+                })
+            },
+            ellipsis (value) {
+                if (!value) return ''
+                if (value.length > 32) {
+                    return value.slice(0, 32) + '...'
+                }
+                return value
+            },
+            judge(event) {
+                let target = event.target;
+
+                if (target.tagName === "SPAN" || target.tagName == "I") {
+                    target = target.parentNode;
+                }
+                const id = target.dataset.id,
+                    type = target.dataset.type;
+
+                console.log(id, type);
+                if (id !== undefined && type !== undefined) {
+                    $.ajax({
+                        method: "post",
+                        url: "/check/service/judge",
+                        data: {
+                            id: id,
+                            type: type
+                        },
+                        success(resp) {
+
+                        },
+                        fail() {
+
+                        }
+                    })
+                }
+            }
+        }
+    })
+</script>
+</html>

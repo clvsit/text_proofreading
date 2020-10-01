@@ -11,7 +11,6 @@
     <div class="background"></div>
     <nav class="navbar navbar-default">
         <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -20,48 +19,20 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Brand</a>
+                <a class="navbar-brand" href="#">基于特定领域的智能文本校对系统</a>
             </div>
-
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
-                    <li><a href="#">Link</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false">Dropdown <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="#">Separated link</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="#">One more separated link</a></li>
-                        </ul>
-                    </li>
-                </ul>
+            <div class="collapse navbar-collapse navbar-right">
                 <form class="navbar-form navbar-left">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search">
+                        <label for="spellService" class="control-label">拼写纠错服务</label>
+                        <input id="spellService" v-model="serviceType" type="radio" name="service" class="form-control radio-service" checked value="0">
+                        <label for="repeatService" class="control-label">字词去重服务</label>
+                        <input id="repeatService" v-model="serviceType" type="radio" name="service" class="form-control radio-service" value="1">
+                        <label for="allService" class="control-label">全部服务</label>
+                        <input id="allService" v-model="serviceType" type="radio" name="service" class="form-control radio-service" value="2">
                     </div>
-                    <button type="submit" class="btn btn-default">Submit</button>
+                    <button @click="query" type="button" class="ml-20 btn btn-default">提交</button>
                 </form>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">Link</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false">Dropdown <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="#">Separated link</a></li>
-                        </ul>
-                    </li>
-                </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
@@ -69,27 +40,119 @@
         <div class="panel panel-text">
             <div class="panel-heading">
                 <h3 class="h3">输入文本</h3>
+                <hr/>
+            </div>
+            <div class="panel-body">
+                <textarea id="inputArea" v-model="document" class="input-area form-control" placeholder="请在此输入文字"></textarea>
             </div>
         </div>
         <div class="panel panel-result">
             <div class="panel-heading">
                 <h3 class="h3">校对结果</h3>
+                <hr/>
+            </div>
+            <div class="panel-body">
+                <ul @click="judge" id="answerList" class="list-group answer-list">
+                    <li class="list-group-item answer-item" v-for="answerItem in answerList">
+                        <div class="answer-info-group">
+                            <span class="label label-info mr-5" v-if="answerItem.type==0">拼写纠错</span>
+                            <span class="label label-warning mr-5" v-else>字词去重</span>
+                            <span class="font-red" v-text="answerItem.source"></span>
+                            <i class="glyphicon glyphicon-arrow-right"></i>
+                            <span v-text="answerItem.answer"></span>
+                        </div>
+                        <div class="answer-choice-group">
+                            <div class="btn btn-success" :data-id="answerItem.id" :data-type="1">
+                                <i class="glyphicon glyphicon-ok"></i>
+                                <span class="ml-5">接受</span>
+                            </div>
+                            <div class="btn btn-danger" :data-id="answerItem.id" :data-type="0">
+                                <i class="glyphicon glyphicon-remove"></i>
+                                <span class="ml-5">拒绝</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
 </body>
 <script src="../static/script/jquery.min.js"></script>
+<script src="../static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+<script src="../static/script/vue.js"></script>
 <script>
     $(document).ready(function () {
         const windowHeight = $(window).height();
 
         $(".panel").css("height", windowHeight - 100);
+        $("#inputArea").css("height", windowHeight - 240);
+        $("#answerList").css("height", windowHeight - 240);
     });
     $(window).resize(function () {
         const windowHeight = $(window).height();
 
         $(".panel").css("height", windowHeight - 100);
+        $("#inputArea").css("height", windowHeight - 240);
+        $("#answerList").css("height", windowHeight - 240);
+    });
+
+    new Vue({
+        el: "#app",
+        data: {
+            serviceType: 0,
+            document: "我准备去程度旅游。\n今天的天好篮\n他没有考虑考虑清楚就开始动手做事了。",
+            answerList: [
+                {id: "1", start: 0, end: 3, answer: "成都", source: "程度", type: 0},
+                {id: "2", start: 0, end: 3, answer: "篮", source: "蓝", type: 0},
+                {id: "3", start: 0, end: 3, answer: "考虑", source: "考虑考虑", type: 1},
+                {id: "1", start: 0, end: 3, answer: "成都", source: "程度", type: 0},
+                {id: "2", start: 0, end: 3, answer: "篮", source: "蓝", type: 0},
+                {id: "3", start: 0, end: 3, answer: "考虑", source: "考虑考虑", type: 1}
+            ]
+        },
+        methods: {
+            query () {
+                $.ajax({
+                    method: "get",
+                    url: "/check/service/get",
+                    data: {
+                        type: this.serviceType,
+                        document: this.document
+                    },
+                    success (resp) {
+                        console.log(resp);
+                    }
+                })
+            },
+            judge (event) {
+                let target = event.target;
+
+                if (target.tagName === "SPAN" || target.tagName == "I") {
+                    target = target.parentNode;
+                }
+                const id = target.dataset.id,
+                    type = target.dataset.type;
+
+                console.log(id, type);
+                if (id !== undefined && type !== undefined) {
+                    $.ajax({
+                        method: "post",
+                        url: "/check/service/judge",
+                        data: {
+                            id: id,
+                            type: type
+                        },
+                        success (resp) {
+
+                        },
+                        fail () {
+
+                        }
+                    })
+                }
+            }
+        }
     })
 </script>
 </html>
