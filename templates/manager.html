@@ -66,8 +66,28 @@
                     <hr/>
                 </div>
                 <div class="panel-body">
-                    <div class="">
-                        <div @click="query" class="btn btn-primary">提交</div>
+                    <div class="query-block">
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <label for="queryDateStart" class="control-label">起始日期</label>
+                                <input id="queryDateStart" v-model="queryParam.dateStart" type="date" class="form-control ml-5">
+                            </div>
+                            <div class="form-group ml-20">
+                                <label for="queryDateEnd" class="control-label">结束日期</label>
+                                <input id="queryDateEnd" v-model="queryParam.dateEnd" type="date" class="form-control ml-5">
+                            </div>
+                            <div class="form-group ml-20">
+                                <label for="queryType" class="control-label">服务类型</label>
+                                <select id="queryType" class="form-control ml-5" v-model="queryParam.type">
+                                    <option value="2">全部</option>
+                                    <option value="0">拼写纠错服务</option>
+                                    <option value="1">字词去重服务</option>
+                                </select>
+                            </div>
+                            <div class="form-group right">
+                                <div @click="query" class="btn btn-default">提交</div>
+                            </div>
+                        </form>
                     </div>
                     <table class="table table-bordered">
                         <tr>
@@ -75,16 +95,30 @@
                             <th>起始位置</th>
                             <th>结束位置</th>
                             <th>服务日期</th>
-                            <th>服务评价</th>
+                            <th>服务类型</th>
                         </tr>
                         <tr v-for="item in dataList">
                             <td v-text="item.document"></td>
                             <td v-text="item.start"></td>
                             <td v-text="item.end"></td>
                             <td v-text="item.date"></td>
-                            <td v-text="item.type"></td>
+                            <td>
+                                <span v-if="item.type==0">拼写纠错服务</span>
+                                <span v-else>字词去重服务</span>
+                            </td>
                         </tr>
                     </table>
+                    <div class="pagination" v-show="queryParam.isQuery">
+                        <form class="form-inline right">
+                            <div class="form-group">
+                                <label for="page" class="control-label">页码</label>
+                                <input id="page" type="text" class="form-control ml-5" v-model="page.number"> / <span v-text="page.total"></span>
+                            </div>
+                            <div class="form-group ml-20">
+                                <div @click="query" class="btn btn-default">跳页</div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -100,9 +134,16 @@
         data: {
             panelType: 0,
             panelName: "数据查看",
-            query_param: {
-                start: 0,
-                limit: 10
+            queryParam: {
+                dateStart: "",
+                dateEnd: "",
+                type: 2,
+                limit: 10,
+                isQuery: false
+            },
+            page: {
+                number: 1,
+                total: 20
             },
             dataList: []
         },
@@ -114,15 +155,21 @@
                     method: "get",
                     url: "/manager/data/get",
                     data: {
-                        start: this.query_param.start,
-                        limit: this.query_param.limit
+                        dateStart: this.queryParam.dateStart,
+                        dateEnd: this.queryParam.dateEnd,
+                        type: this.queryParam.type,
+                        start: this.page.number,
+                        limit: this.queryParam.limit
                     },
                     success(resp) {
                         if (resp.code === 1) {
-                            for (let i = 0, len = resp.data.length; i < len; i++) {
-                                resp.data[i].document = _this.ellipsis(resp.data[i].document);
+                            let respData = resp.data;
+                            for (let i = 0, len = respData.data.length; i < len; i++) {
+                                respData.data[i].document = _this.ellipsis(respData.data[i].document);
                             }
-                            _this.dataList = resp.data;
+                            _this.dataList = respData.data;
+                            _this.page.total = Math.ceil(respData.count / _this.queryParam.limit);
+                            _this.queryParam.isQuery = true;
                         }
 
                     }
