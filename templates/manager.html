@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>智能文本校对后台管理系统</title>
+    <title>智能文本校对系统后台管理平台</title>
     <link href="../static/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="../static/style/style.css" rel="stylesheet" type="text/css">
 </head>
@@ -12,7 +12,7 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">智能文本校对后台管理系统</a>
+                <a class="navbar-brand" href="#">智能文本校对系统后台管理平台</a>
             </div>
             <div class="collapse navbar-collapse navbar-right">
                 <form class="navbar-form navbar-left">
@@ -32,27 +32,24 @@
                     <hr/>
                 </div>
                 <ul class="list-group">
-                    <li class="list-group-item">
+                    <li class="list-group-item" @click="panelType=1">
                         <i class="glyphicon glyphicon-list-alt"></i>
-                        <span class="ml-5">数据查看</span>
+                        <span class="ml-5">数据查询</span>
                     </li>
-                    <li class="list-group-item">
+                    <li class="list-group-item" @click="panelType=2">
                         <i class="glyphicon glyphicon-hdd"></i>
-                        <span class="ml-5">数据分析</span>
+                        <span class="ml-5">数据统计</span>
                     </li>
                 </ul>
             </div>
-            <div class="panel">
-                <div class="panel-heading">
-                    <h4 class="h4">平台管理</h4>
-                    <hr/>
-                </div>
-            </div>
         </div>
-        <div class="panel panel-main">
+        <div class="panel panel-main" style="overflow: auto;">
             <div v-if="panelType==0">
+                <div style="background: url('../static/img/index.jpg') center center no-repeat; width: 100%; height: 660px;"></div>
+            </div>
+            <div v-else-if="panelType==1">
                 <div class="panel-heading">
-                    <h3 class="h3" v-text="panelName"></h3>
+                    <h3 class="h3">数据查询</h3>
                     <hr/>
                 </div>
                 <div class="panel-body">
@@ -60,18 +57,29 @@
                         <form class="form-inline">
                             <div class="form-group">
                                 <label for="queryDateStart" class="control-label">起始日期</label>
-                                <input id="queryDateStart" v-model="queryParam.dateStart" type="date" class="form-control ml-5">
+                                <input id="queryDateStart" v-model="queryParam.dateStart" type="date"
+                                       class="form-control ml-5 w-150">
                             </div>
                             <div class="form-group ml-20">
                                 <label for="queryDateEnd" class="control-label">结束日期</label>
-                                <input id="queryDateEnd" v-model="queryParam.dateEnd" type="date" class="form-control ml-5">
+                                <input id="queryDateEnd" v-model="queryParam.dateEnd" type="date"
+                                       class="form-control ml-5 w-150">
                             </div>
                             <div class="form-group ml-20">
                                 <label for="queryType" class="control-label">服务类型</label>
                                 <select id="queryType" class="form-control ml-5" v-model="queryParam.type">
                                     <option value="2">全部</option>
-                                    <option value="0">拼写纠错服务</option>
-                                    <option value="1">字词去重服务</option>
+                                    <option value="0">形音纠错服务</option>
+                                    <option value="1">重复纠错服务</option>
+                                </select>
+                            </div>
+                            <div class="form-group ml-20">
+                                <label for="queryType" class="control-label">用户反馈</label>
+                                <select id="queryType" class="form-control ml-5" v-model="queryParam.feedback">
+                                    <option value="3">全部</option>
+                                    <option value="0">拒绝</option>
+                                    <option value="1">接受</option>
+                                    <option value="2">无评价</option>
                                 </select>
                             </div>
                             <div class="form-group right">
@@ -82,27 +90,32 @@
                     <table class="table table-bordered">
                         <tr>
                             <th>输入文本</th>
-                            <th>起始位置</th>
-                            <th>结束位置</th>
                             <th>服务日期</th>
                             <th>服务类型</th>
+                            <th>用户反馈</th>
+                            <th>相关操作</th>
                         </tr>
                         <tr v-for="item in dataList">
                             <td v-text="item.document"></td>
-                            <td v-text="item.start"></td>
-                            <td v-text="item.end"></td>
                             <td v-text="item.date"></td>
                             <td>
                                 <span v-if="item.type==0">拼写纠错服务</span>
                                 <span v-else>字词去重服务</span>
                             </td>
+                            <td>
+                                <span v-if="item.feedback==0">拒绝</span>
+                                <span v-else-if="item.feedback==1">接受</span>
+                                <span v-else>无评价</span>
+                            </td>
+                            <td style="pointer: cursor;">查看详情</td>
                         </tr>
                     </table>
                     <div class="pagination" v-show="queryParam.isQuery">
                         <form class="form-inline right">
                             <div class="form-group">
                                 <label for="page" class="control-label">页码</label>
-                                <input id="page" type="text" class="form-control ml-5" v-model="page.number"> / <span v-text="page.total"></span>
+                                <input id="page" type="text" class="form-control ml-5" v-model="page.number"> / <span
+                                    v-text="page.total"></span>
                             </div>
                             <div class="form-group ml-20">
                                 <div @click="query" class="btn btn-default">跳页</div>
@@ -111,23 +124,114 @@
                     </div>
                 </div>
             </div>
+            <div v-else-if="panelType==2">
+                <div class="panel-heading">
+                    <h3 class="h3">数据统计</h3>
+                    <hr/>
+                </div>
+                <div class="panel-body">
+                    <div class="query-block">
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <label for="queryDateStart" class="control-label">起始日期</label>
+                                <input id="queryDateStart" v-model="queryParam.dateStart" type="date"
+                                       class="form-control ml-5 w-150">
+                            </div>
+                            <div class="form-group ml-20">
+                                <label for="queryDateEnd" class="control-label">结束日期</label>
+                                <input id="queryDateEnd" v-model="queryParam.dateEnd" type="date"
+                                       class="form-control ml-5 w-150">
+                            </div>
+                            <div class="form-group right">
+                                <div @click="query" class="btn btn-default">提交</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div id="serviceCount" style="width: 500px;height:400px;"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="serviceCountPie" style="width: 300px;height:400px;"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="serviceCountStatistic" style="width: 800px;height:500px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mask hidden"></div>
+    <div class="panel panel-detail hidden">
+        <div class="panel-heading">
+            <h3>数据详情</h3>
+        </div>
+        <div class="panel-body">
+            <form class="form form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label for="detailDate" class="control-label">服务日期：</label>
+                        <input id="detailDate" type="text" class="form-control" value="2020-08-07 21:38:10" disabled/>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="detailDate" class="control-label">服务类型：</label>
+                        <input id="detailDate" type="text" class="form-control" value="形音纠错" disabled/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="detailDate" class="control-label">起始位置：</label>
+                        <input id="detailDate" type="text" class="form-control" value="6" disabled/>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="detailDate" class="control-label">结束位置：</label>
+                        <input id="detailDate" type="text" class="form-control" value="7" disabled/>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="detailDate" class="control-label">用户反馈：</label>
+                        <input id="detailDate" type="text" class="form-control" value="接受" disabled/>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="detailDate" class="control-label">纠错建议：</label>
+                        <input id="detailDate" type="text" class="form-control" value="的" disabled/>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="detailDate" class="control-label">纠错置信度：</label>
+                        <input id="detailDate" type="text" class="form-control" value="0.9834" disabled/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label for="detailDate" class="control-label">输入文本：</label>
+                        <textarea id="detailDocument" rows="9" class="form-control" disabled></textarea>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 </body>
 <script src="../static/script/jquery.min.js"></script>
 <script src="../static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+<script src="../static/script/echarts.min.js"></script>
 <script src="../static/script/vue.js"></script>
 <script>
+
+
     new Vue({
         el: "#app",
         data: {
-            panelType: 0,
-            panelName: "数据查看",
+            panelType: 2,
             queryParam: {
                 dateStart: "",
                 dateEnd: "",
                 type: 2,
+                feedback: 3,
                 limit: 10,
                 isQuery: false
             },
@@ -148,6 +252,7 @@
                         dateStart: this.queryParam.dateStart,
                         dateEnd: this.queryParam.dateEnd,
                         type: this.queryParam.type,
+                        feedback: this.queryParam.feedback,
                         start: this.page.number,
                         limit: this.queryParam.limit
                     },
@@ -165,10 +270,10 @@
                     }
                 })
             },
-            ellipsis (value) {
+            ellipsis(value) {
                 if (!value) return ''
-                if (value.length > 32) {
-                    return value.slice(0, 32) + '...'
+                if (value.length > 24) {
+                    return value.slice(0, 24) + '...'
                 }
                 return value
             },
@@ -200,6 +305,282 @@
                 }
             }
         }
+    })
+
+    const optionService = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                crossStyle: {
+                    color: '#999'
+                }
+            }
+        },
+        title: {
+            text: "各服务使用次数",
+            align: "center"
+        },
+        legend: {
+            data: ['形音纠错', '重复纠错'],
+            align: "right"
+        },
+        xAxis: [
+            {
+                type: 'category',
+                data: ['20-10-04', '20-10-05', '20-10-06'],
+                axisPointer: {
+                    type: 'shadow'
+                }
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                name: '使用次数',
+                min: 0,
+                max: 120,
+                interval: 40,
+                axisLabel: {
+                    formatter: '{value} 次'
+                }
+            }
+        ],
+        series: [
+            {
+                name: '形音纠错',
+                type: 'bar',
+                label: {
+                    show: true,
+                    position: 'inside'
+                },
+                data: [32, 34, 42]
+            },
+            {
+                name: '重复纠错',
+                type: 'bar',
+                label: {
+                    show: true,
+                    position: 'inside'
+                },
+                data: [24, 32, 14]
+            }
+        ]
+    };
+    const optionServicePie = {
+        title: {
+            text: '各服务使用次数',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        series: [
+            {
+                name: '服务类型',
+                type: 'pie',
+                radius: '40%',
+                data: [
+                    {value: 108, name: '形音纠错'},
+                    {value: 80, name: '重复纠错'}
+                ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    var builderJson = {
+        "all": 120,
+        "charts": {
+            "形音纠错-接受次数": 92,
+            "重复纠错-接受次数": 76
+        },
+        "components": {
+            "形音纠错-拒绝次数": 16,
+            "重复纠错-拒绝次数": 4,
+        }
+    };
+
+    var downloadJson = {
+        "接受次数": 92,
+        "拒绝次数": 16
+    };
+
+    var themeJson = {
+        "接受次数": 76,
+        "拒绝次数": 4,
+    };
+
+
+    option = {
+        tooltip: {},
+        title: [{
+            text: '各服务接受率与拒绝率',
+            left: '25%',
+            textAlign: 'center'
+        }, {
+            text: '形音纠错',
+            subtext: '总计 ' + Object.keys(downloadJson).reduce(function (all, key) {
+                return all + downloadJson[key];
+            }, 0),
+            left: '75%',
+            textAlign: 'center'
+        }, {
+            text: '重复纠错',
+            subtext: '总计 ' + Object.keys(themeJson).reduce(function (all, key) {
+                return all + themeJson[key];
+            }, 0),
+            left: '75%',
+            top: '50%',
+            textAlign: 'center'
+        }],
+        grid: [{
+            top: 50,
+            width: '50%',
+            bottom: '45%',
+            left: 10,
+            containLabel: true
+        }, {
+            top: '55%',
+            width: '50%',
+            bottom: 0,
+            left: 10,
+            containLabel: true
+        }],
+        xAxis: [{
+            type: 'value',
+            max: builderJson.all,
+            splitLine: {
+                show: false
+            }
+        }, {
+            type: 'value',
+            max: builderJson.all,
+            gridIndex: 1,
+            splitLine: {
+                show: false
+            }
+        }],
+        yAxis: [{
+            type: 'category',
+            data: Object.keys(builderJson.charts),
+            axisLabel: {
+                interval: 0,
+                rotate: 30
+            },
+            splitLine: {
+                show: false
+            }
+        }, {
+            gridIndex: 1,
+            type: 'category',
+            data: Object.keys(builderJson.components),
+            axisLabel: {
+                interval: 0,
+                rotate: 30
+            },
+            splitLine: {
+                show: false
+            }
+        }],
+        series: [{
+            type: 'bar',
+            stack: 'chart',
+            z: 3,
+            label: {
+                normal: {
+                    position: 'right',
+                    show: true
+                }
+            },
+            data: Object.keys(builderJson.charts).map(function (key) {
+                return builderJson.charts[key];
+            })
+        }, {
+            type: 'bar',
+            stack: 'chart',
+            silent: true,
+            itemStyle: {
+                normal: {
+                    color: '#eee'
+                }
+            },
+            data: Object.keys(builderJson.charts).map(function (key) {
+                return builderJson.all - builderJson.charts[key];
+            })
+        }, {
+            type: 'bar',
+            stack: 'component',
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            z: 3,
+            label: {
+                normal: {
+                    position: 'right',
+                    show: true
+                }
+            },
+            data: Object.keys(builderJson.components).map(function (key) {
+                return builderJson.components[key];
+            })
+        }, {
+            type: 'bar',
+            stack: 'component',
+            silent: true,
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            itemStyle: {
+                normal: {
+                    color: '#eee'
+                }
+            },
+            data: Object.keys(builderJson.components).map(function (key) {
+                return builderJson.all - builderJson.components[key];
+            })
+        }, {
+            type: 'pie',
+            radius: [0, '30%'],
+            center: ['75%', '25%'],
+            data: Object.keys(downloadJson).map(function (key) {
+                return {
+                    name: key.replace('.js', ''),
+                    value: downloadJson[key]
+                }
+            }),
+            label: {
+                formatter: '{b}: {d}%'
+            }
+        }, {
+            type: 'pie',
+            radius: [0, '30%'],
+            center: ['75%', '75%'],
+            data: Object.keys(themeJson).map(function (key) {
+                return {
+                    name: key.replace('.js', ''),
+                    value: themeJson[key]
+                };
+            }),
+            label: {
+                formatter: '{b}: {d}%'
+            }
+        }]
+    };
+
+    $(document).ready(function () {
+        console.log(document.getElementById('serviceCount'));
+        let serviceChart = echarts.init(document.getElementById('serviceCount')),
+            serviceChartPie = echarts.init(document.getElementById('serviceCountPie')),
+            serviceStatistic = echarts.init(document.getElementById('serviceCountStatistic'))
+
+        serviceChart.setOption(optionService);
+        serviceChartPie.setOption(optionServicePie);
+        serviceStatistic.setOption(option);
     })
 </script>
 </html>

@@ -24,9 +24,9 @@
             <div class="collapse navbar-collapse navbar-right">
                 <form class="navbar-form navbar-left">
                     <div class="form-group">
-                        <label for="spellService" class="control-label">拼写纠错服务</label>
+                        <label for="spellService" class="control-label">形音纠错服务</label>
                         <input id="spellService" v-model="serviceType" type="radio" name="service" class="form-control radio-service" checked value="0">
-                        <label for="repeatService" class="control-label">字词去重服务</label>
+                        <label for="repeatService" class="control-label">重复纠错服务</label>
                         <input id="repeatService" v-model="serviceType" type="radio" name="service" class="form-control radio-service" value="1">
                         <label for="allService" class="control-label">全部服务</label>
                         <input id="allService" v-model="serviceType" type="radio" name="service" class="form-control radio-service" value="2">
@@ -55,8 +55,8 @@
                 <ul @click="judge" id="answerList" class="list-group answer-list">
                     <li class="list-group-item answer-item" v-for="answerItem in answerList">
                         <div class="answer-info-group">
-                            <span class="label label-info mr-5" v-if="answerItem.type==0">拼写纠错</span>
-                            <span class="label label-warning mr-5" v-else>字词去重</span>
+                            <span class="label label-info mr-5" v-if="answerItem.type==0">形音纠错</span>
+                            <span class="label label-warning mr-5" v-else>重复纠错</span>
                             <span class="font-red" v-text="answerItem.source"></span>
                             <i class="glyphicon glyphicon-arrow-right"></i>
                             <span v-text="answerItem.answer"></span>
@@ -101,27 +101,23 @@
         el: "#app",
         data: {
             serviceType: 0,
-            document: "我准备去程度旅游。\n今天的天好篮\n他没有考虑考虑清楚就开始动手做事了。",
+            document: "",
+            {#document: "我准备去程度旅游。\n今天的天好篮\n他没有考虑考虑清楚就开始动手做事了。",#}
             answerList: [
-                {id: "1", start: 0, end: 3, answer: "成都", source: "程度", type: 0},
-                {id: "2", start: 0, end: 3, answer: "篮", source: "蓝", type: 0},
-                {id: "3", start: 0, end: 3, answer: "考虑", source: "考虑考虑", type: 1},
-                {id: "1", start: 0, end: 3, answer: "成都", source: "程度", type: 0},
-                {id: "2", start: 0, end: 3, answer: "篮", source: "蓝", type: 0},
-                {id: "3", start: 0, end: 3, answer: "考虑", source: "考虑考虑", type: 1}
+
             ]
         },
         methods: {
             query () {
+                const _this = this;
                 $.ajax({
-                    method: "get",
-                    url: "/check/service/get",
+                    method: "post",
+                    url: "/checker/service/spell",
                     data: {
-                        type: this.serviceType,
                         document: this.document
                     },
                     success (resp) {
-                        console.log(resp);
+                        _this.answerList = resp.data.answerList;
                     }
                 })
             },

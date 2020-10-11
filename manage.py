@@ -2,6 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from manager.database_backup import start_backup
 
 
 def main():
@@ -19,3 +20,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    start_backup()
