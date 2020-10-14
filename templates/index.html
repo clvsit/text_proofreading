@@ -55,7 +55,7 @@
                 <ul @click="judge" id="answerList" class="list-group answer-list">
                     <li class="list-group-item answer-item" v-for="answerItem in answerList">
                         <div class="answer-info-group">
-                            <span class="label label-info mr-5" v-if="answerItem.type==0">形音纠错</span>
+                            <span class="label label-info mr-5" v-if="answerItem.type==0">拼写纠错</span>
                             <span class="label label-warning mr-5" v-else>重复纠错</span>
                             <span class="font-red" v-text="answerItem.source"></span>
                             <i class="glyphicon glyphicon-arrow-right"></i>
