@@ -1,4 +1,5 @@
 import json
+import time
 
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -13,16 +14,17 @@ def index(request):
 @csrf_exempt
 def get_service(request):
     print(request.method)
+    time.sleep(0.5)
     if request.method == "POST":
         resp = {
             'code': 1,
             'msg': '调用服务成功',
             'data': {
                 "answerList": [
-                    {"id": "60e38bfe7af14d7c96c586cc3443a7f7", "start": 0, "end": 3, "answer": "成都", "source": "程度",
-                     "type": "0"},
-                    {"id": "96873e8dcf074405963b6f9b9ab02dc6", "start": 0, "end": 3, "answer": "篮", "source": "蓝",
-                     "type": "0"},
+                    # {"id": "60e38bfe7af14d7c96c586cc3443a7f7", "start": 0, "end": 3, "answer": "成都", "source": "程度",
+                    #  "type": "0"},
+                    # {"id": "96873e8dcf074405963b6f9b9ab02dc6", "start": 0, "end": 3, "answer": "篮", "source": "蓝",
+                    #  "type": "0"},
                     {"id": "b16845bfc12744f591b9c4ed22ec5f74", "start": 0, "end": 3, "answer": "考虑", "source": "考虑考虑",
                      "type": "1"}
                 ]

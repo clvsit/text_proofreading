@@ -28,6 +28,38 @@
         <div class="sidebar">
             <div class="panel">
                 <div class="panel-heading">
+                    <h4 class="h4">系统管理</h4>
+                    <hr/>
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item" @click="panelType=1">
+                        <i class="glyphicon glyphicon-scale"></i>
+                        <span class="ml-5">运行状态</span>
+                    </li>
+                    <li class="list-group-item" @click="panelType=2">
+                        <i class="glyphicon glyphicon-cog"></i>
+                        <span class="ml-5">环境设置</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="panel">
+                <div class="panel-heading">
+                    <h4 class="h4">权限管理</h4>
+                    <hr/>
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item" @click="panelType=1">
+                        <i class="glyphicon glyphicon-user"></i>
+                        <span class="ml-5">用户管理</span>
+                    </li>
+                    <li class="list-group-item" @click="panelType=2">
+                        <i class="glyphicon glyphicon-lock"></i>
+                        <span class="ml-5">角色管理</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="panel">
+                <div class="panel-heading">
                     <h4 class="h4">数据管理</h4>
                     <hr/>
                 </div>
@@ -107,7 +139,7 @@
                                 <span v-else-if="item.feedback==1">接受</span>
                                 <span v-else>无评价</span>
                             </td>
-                            <td style="pointer: cursor;">查看详情</td>
+                            <td style="pointer: cursor;" @click="open">查看详情</td>
                         </tr>
                     </table>
                     <div class="pagination" v-show="queryParam.isQuery">
@@ -161,13 +193,16 @@
                                 <div id="serviceCountStatistic" style="width: 800px;height:500px;"></div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div style="height: 150px;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="mask hidden"></div>
-    <div class="panel panel-detail hidden">
+    <div class="mask" v-if="isOpen"></div>
+    <div class="panel panel-detail" v-if="isOpen">
         <div class="panel-heading">
             <h3>数据详情</h3>
         </div>
@@ -176,7 +211,7 @@
                 <div class="form-group">
                     <div class="col-md-6">
                         <label for="detailDate" class="control-label">服务日期：</label>
-                        <input id="detailDate" type="text" class="form-control" value="2020-08-07 21:38:10" disabled/>
+                        <input id="detailDate" type="text" class="form-control" value="2020-09-18 21:38:10" disabled/>
                     </div>
                     <div class="col-md-6">
                         <label for="detailDate" class="control-label">服务类型：</label>
@@ -186,11 +221,11 @@
                 <div class="form-group">
                     <div class="col-md-2">
                         <label for="detailDate" class="control-label">起始位置：</label>
-                        <input id="detailDate" type="text" class="form-control" value="6" disabled/>
+                        <input id="detailDate" type="text" class="form-control" value="250" disabled/>
                     </div>
                     <div class="col-md-2">
                         <label for="detailDate" class="control-label">结束位置：</label>
-                        <input id="detailDate" type="text" class="form-control" value="7" disabled/>
+                        <input id="detailDate" type="text" class="form-control" value="251" disabled/>
                     </div>
                     <div class="col-md-2">
                         <label for="detailDate" class="control-label">用户反馈：</label>
@@ -198,11 +233,11 @@
                     </div>
                     <div class="col-md-3">
                         <label for="detailDate" class="control-label">纠错建议：</label>
-                        <input id="detailDate" type="text" class="form-control" value="的" disabled/>
+                        <input id="detailDate" type="text" class="form-control" value="我" disabled/>
                     </div>
                     <div class="col-md-3">
                         <label for="detailDate" class="control-label">纠错置信度：</label>
-                        <input id="detailDate" type="text" class="form-control" value="0.9834" disabled/>
+                        <input id="detailDate" type="text" class="form-control" value="0.6981" disabled/>
                     </div>
                 </div>
                 <div class="form-group">
@@ -219,13 +254,14 @@
 <script src="../static/script/jquery.min.js"></script>
 <script src="../static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
 <script src="../static/script/echarts.min.js"></script>
-<script src="../static/script/vue.js"></script>
+<script src="../static/script/vue.min.js"></script>
 <script>
 
 
     new Vue({
         el: "#app",
         data: {
+            isOpen: false,
             panelType: 2,
             queryParam: {
                 dateStart: "",
@@ -242,6 +278,10 @@
             dataList: []
         },
         methods: {
+            open () {
+                this.isOpen = true;
+                $("#detailDocument").val("因为罗伯特·伯恩斯没有足够的资金来支付旅费，前往西印度群岛，加文·汉密尔顿认为罗伯特·伯恩斯应该平均发表他的诗，可以从中获得一点金钱，提供他更宽裕的生活。4月3日，罗伯特·伯恩斯发送他的苏格兰诗歌给基尔马诺克一个本地出版商约翰·威尔逊，建议在1786年4月发表，同一天，Jean Armour的父亲撕毁伯恩斯的婚姻证书。7月22日，他转移了在Mossgiel农场的份额给弟弟吉尔伯特。7月30日，罗伯特·伯恩斯写信告诉他的朋友约翰·里士满说，「Jean Armour把我扔在监狱里，直到我能获得巨富。窝从一个朋友家流浪到另一个朋友家。」")
+            },
             query() {
                 let _this = this;
 
@@ -322,7 +362,7 @@
             align: "center"
         },
         legend: {
-            data: ['形音纠错', '重复纠错'],
+            data: ['拼写纠错', '重复纠错'],
             align: "right"
         },
         xAxis: [
@@ -348,7 +388,7 @@
         ],
         series: [
             {
-                name: '形音纠错',
+                name: '拼写纠错',
                 type: 'bar',
                 label: {
                     show: true,
@@ -382,8 +422,8 @@
                 type: 'pie',
                 radius: '40%',
                 data: [
-                    {value: 108, name: '形音纠错'},
-                    {value: 80, name: '重复纠错'}
+                    {value: 108, name: '拼写纠错'},
+                    {value: 70, name: '重复纠错'}
                 ],
                 emphasis: {
                     itemStyle: {
@@ -398,23 +438,23 @@
     var builderJson = {
         "all": 120,
         "charts": {
-            "形音纠错-接受次数": 92,
-            "重复纠错-接受次数": 76
+            "拼写纠错-接受次数": 96,
+            "重复纠错-接受次数": 113
         },
         "components": {
-            "形音纠错-拒绝次数": 16,
-            "重复纠错-拒绝次数": 4,
+            "拼写纠错-拒绝次数": 24,
+            "重复纠错-拒绝次数": 7,
         }
     };
 
     var downloadJson = {
-        "接受次数": 92,
-        "拒绝次数": 16
+        "接受次数": 96,
+        "拒绝次数": 24
     };
 
     var themeJson = {
-        "接受次数": 76,
-        "拒绝次数": 4,
+        "接受次数": 113,
+        "拒绝次数": 7,
     };
 
 
@@ -425,7 +465,7 @@
             left: '25%',
             textAlign: 'center'
         }, {
-            text: '形音纠错',
+            text: '拼写纠错',
             subtext: '总计 ' + Object.keys(downloadJson).reduce(function (all, key) {
                 return all + downloadJson[key];
             }, 0),
